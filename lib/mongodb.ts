@@ -1,0 +1,27 @@
+// lib/mongodb.ts
+import { MongoClient } from "mongodb";
+
+if (!process.env.MONGODB_URI) {
+  throw new Error("MONGODB_URI is not defined in environment variables");
+}
+
+const uri = process.env.MONGODB_URI;
+
+let client: MongoClient;
+let clientPromise: Promise<MongoClient>;
+
+declare global {
+  // evita múltiplas conexões durante hot reload no Next.js
+  // eslint-disable-next-line no-var
+  var _mongoClientPromise: Promise<MongoClient> | undefined;
+}
+
+if (!global._mongoClientPromise) {
+  client = new MongoClient(uri);
+  clientPromise = client.connect();
+  global._mongoClientPromise = clientPromise;
+} else {
+  clientPromise = global._mongoClientPromise;
+}
+
+export default clientPromise;

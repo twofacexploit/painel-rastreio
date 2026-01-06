@@ -1,0 +1,154 @@
+/* ================================
+   RESET PROFISSIONAL
+================================ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  scroll-behavior: smooth;
+  background-color: #F4F6F9;
+}
+
+/* Remove highlight azul do mobile */
+input,
+button,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ================================
+   FONTES PROFISSIONAIS
+   (Vêm do next/font)
+================================ */
+:root {
+  --font-inter: "Inter", sans-serif;
+  --font-poppins: "Poppins", sans-serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter);
+}
+
+.font-poppins {
+  font-family: var(--font-poppins);
+}
+
+/* ================================
+   TIPOGRAFIA GLOBAL
+================================ */
+body {
+  font-family: var(--font-inter);
+  color: #1a1a1a;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Melhor renderização */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* ================================
+   SCROLLBAR PERSONALIZADA
+================================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e5e7eb; /* cinza claro */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E90FF; /* azul corporativo Brava Cargo */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0A66C2;
+}
+
+/* ================================
+   IMAGENS RESPONSIVAS
+================================ */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* ================================
+   LINKS
+================================ */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: 0.2s;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* ================================
+   CONTAINERS GLOBAIS
+================================ */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ================================
+   ELEMENTOS INTERATIVOS
+================================ */
+button {
+  cursor: pointer;
+}
+
+/* Remove arrows do input number (Chrome) */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+/* ================================
+   UTILIDADES VISUAIS
+================================ */
+.shadow-soft {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.border-light {
+  border: 1px solid #e5e7eb;
+}
+
+/* ================================
+   CLASSE PARA REMOVER SCROLLBAR MOBILE
+================================ */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
