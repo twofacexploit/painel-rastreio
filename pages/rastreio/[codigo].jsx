@@ -118,88 +118,100 @@ export default function Rastreio() {
     );
   }
 
-  /* ================= EVENTOS ================= */
-  const baseDate = new Date(tracking.events?.[0]?.date || new Date());
+  /* ================= EVENTOS (LÓGICA CORRIGIDA) ================= */
+
+  // 🔒 BASE IMUTÁVEL: SEMPRE O POSTADO
+  const postadoDate = new Date(tracking.events?.[0]?.date || "2026-01-04T01:01:00");
 
   function addDaysWithHour(days, hour) {
-    const d = new Date(baseDate);
+    const d = new Date(postadoDate);
     d.setDate(d.getDate() + days);
     d.setHours(hour, 0, 0, 0);
     return d;
   }
 
-  const events = [
-    {
-      title: "Tentativa de Entrega Adiada",
-      description: "Previsto para próxima semana útil.",
-      location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
-      date: addDaysWithHour(9, 16),
-    },
-    {
-      title: "Destinatário Ausente",
-      description: "Aguarde uma nova tentativa de entrega.",
-      location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
-      date: addDaysWithHour(8, 14),
-    },
-    {
-      title: "Saiu para entrega",
-      description: "",
-      location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
-      date: addDaysWithHour(7, 8),
-    },
-    {
-      title: "Objeto conferido e separado para entrega",
-      description: "",
-      location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
-      date: addDaysWithHour(6, 18),
-    },
-    {
-      title: "Objeto chegou à unidade de destino",
-      description: "",
-      location: `Unidade de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
-      date: addDaysWithHour(5, 15),
-    },
-    {
-      title: "Objeto em trânsito para Cidade Destino",
-      description: "",
-      location: "Unidade de Transbordo – São José dos Campos/SP",
-      date: addDaysWithHour(4, 10),
-    },
-    {
-      title: "Objeto recebido na unidade de transbordo",
-      description: "",
-      location: "Unidade de Transbordo – São Paulo/SP",
-      date: addDaysWithHour(3, 17),
-    },
-    {
-      title: "Objeto encaminhado",
-      description: "",
-      location: "Unidade de Tratamento – São Paulo/SP",
-      date: addDaysWithHour(2, 11),
-    },
-    {
-      title: "Objeto em processo de triagem",
-      description: "",
-      location: "Unidade de Tratamento – São Paulo/SP",
-      date: addDaysWithHour(1, 9),
-    },
-    {
-      title: "Objeto coletado",
-      description: "",
-      location: "Unidade Operacional – São Paulo/SP",
-      date: addDaysWithHour(0, 7),
-    },
-    {
-      title: "Objeto postado",
-      description: "Seu pedido foi postado e está em processamento.",
-      location: "Agência de Postagem – São Paulo/SP",
-      date: baseDate,
-    },
-  ];
+ const events = [
+  {
+    title: "Objeto coletado",
+    description: "",
+    location: "Unidade Operacional – São Paulo/SP",
+    date: new Date(postadoDate),
+  },
+
+  {
+    title: "Objeto postado",
+    description: "Seu pedido foi postado e está em processamento.",
+    location: "Agência de Postagem – São Paulo/SP",
+    date: new Date(postadoDate.getTime() + 30 * 60 * 1000), // +30 min
+  },
+
+  {
+    title: "Objeto em processo de triagem",
+    description: "",
+    location: "Unidade de Tratamento – São Paulo/SP",
+    date: addDaysWithHour(1, 9),
+  },
+
+  {
+    title: "Objeto encaminhado",
+    description: "",
+    location: "Unidade de Tratamento – São Paulo/SP",
+    date: addDaysWithHour(2, 11),
+  },
+
+  {
+    title: "Objeto recebido na unidade de transbordo",
+    description: "",
+    location: "Unidade de Transbordo – São Paulo/SP",
+    date: addDaysWithHour(3, 17),
+  },
+
+  {
+    title: "Objeto em trânsito para Cidade Destino",
+    description: "",
+    location: "Unidade de Transbordo – São José dos Campos/SP",
+    date: addDaysWithHour(4, 10),
+  },
+
+  {
+    title: "Objeto chegou à unidade de destino",
+    description: "",
+    location: `Unidade de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
+    date: addDaysWithHour(5, 15),
+  },
+
+  {
+    title: "Objeto conferido e separado para entrega",
+    description: "",
+    location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
+    date: addDaysWithHour(6, 18),
+  },
+
+  {
+    title: "Saiu para entrega",
+    description: "",
+    location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
+    date: addDaysWithHour(7, 8),
+  },
+
+  {
+    title: "Destinatário Ausente",
+    description: "Aguarde uma nova tentativa de entrega.",
+    location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
+    date: addDaysWithHour(8, 14),
+  },
+
+  {
+    title: "Tentativa de Entrega Adiada",
+    description: "Previsto para próxima semana útil.",
+    location: `Centro de Distribuição – ${tracking.destinationCity}/${stateMap[tracking.destinationState]}`,
+    date: addDaysWithHour(9, 16),
+  },
+];
 
   const now = new Date();
   const visibleEvents = events.filter(e => e.date <= now).sort((a, b) => b.date - a.date);
-  const lastEvent = visibleEvents[0] || events[events.length - 1];
+  const lastEvent = visibleEvents[0];
 
   function progressIndex(title = "") {
     const t = title.toLowerCase();
@@ -210,7 +222,7 @@ export default function Rastreio() {
     return 0;
   }
 
-  const currentStep = progressIndex(lastEvent.title);
+  const currentStep = progressIndex(lastEvent.title)
 
   /* ================= RENDER ================= */
   return (
