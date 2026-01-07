@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Footer from "@/components/Footer";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
@@ -229,7 +230,7 @@ export default function Rastreio() {
     <div className="bg-[#0E1624] text-gray-200 min-h-screen">
 
       {/* HEADER */}
-      <header className="bg-[#0E1624] border-b border-[#1E293B] sticky top-0 z-50">
+      <header className="bg-[#0E1624] border-b border-[#1E293B]">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Image src="/images/logo.png" alt="Brava Cargo" width={180} height={60} />
           <button onClick={() => router.push("/")} className="text-sm text-gray-400 hover:text-[#1E90FF]">
@@ -330,47 +331,95 @@ export default function Rastreio() {
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="bg-[#020617] border-t border-[#1E293B]">
-        <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-10 text-sm">
+ {/* ================= FOOTER ================= */}
+<footer className="bg-[#020617]">
 
-          <div>
-            <Image
-              src="/images/logo.png"
-              alt="Brava Cargo"
-              width={180}
-              height={60}
-              className="object-contain mb-4"
-            />
-            <p className="text-gray-400">
-              Logística rodoviária nacional com controle operacional,
-              rastreabilidade completa e gestão de ocorrências.
-            </p>
-          </div>
+  {/* CONTEÚDO PRINCIPAL DO FOOTER */}
+  <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-sm">
 
-          <div>
-            <h4 className="text-white font-bold mb-3">Contato</h4>
-            <p className="text-gray-400">
-              (11) 3090-5544<br />
-              atendimento@bravacargo.com<br />
-              São Paulo - SP
-            </p>
-          </div>
+    {/* LOGO + DESCRIÇÃO */}
+    <div>
+      <Image
+        src="/images/logo.png"
+        alt="Brava Cargo"
+        width={120}
+        height={40}
+        className="object-contain"
+      />
+      <p className="mt-3 text-gray-400 text-sm">
+        Logística rodoviária nacional com rastreamento e controle operacional.
+      </p>
+    </div>
 
-          <div>
-            <h4 className="text-white font-bold mb-3">Segurança</h4>
-            <p className="text-gray-400">
-              Plataforma segura<br />
-              Monitoramento contínuo<br />
-              Conformidade operacional
-            </p>
-          </div>
+    {/* INSTITUCIONAL */}
+    <div>
+      <h4 className="text-white font-bold">Institucional</h4>
+      <ul className="mt-3 space-y-2 text-gray-400 text-sm">
 
-        </div>
+        <li>
+          <a
+            href="/institucional/sobre"
+            className="hover:text-[#1E90FF] transition"
+          >
+            Sobre a Empresa
+          </a>
+        </li>
 
-        <div className="border-t border-[#1E293B] py-4 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} Brava Cargo • Todos os direitos reservados
-        </div>
+        <li>
+          <a
+            href="/institucional/governanca"
+            className="hover:text-[#1E90FF] transition"
+          >
+            Governança
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+    {/* SERVIÇOS */}
+    <div>
+      <h4 className="text-white font-bold">Serviços</h4>
+      <ul className="mt-3 space-y-2 text-gray-400 text-sm">
+
+        <li>
+          <a
+            href="/servicos/rastreamento"
+            className="hover:text-[#1E90FF] transition"
+          >
+            Rastreamento
+          </a>
+        </li>
+
+        <li>
+          <a
+            href="/servicos/distribuicao"
+            className="hover:text-[#1E90FF] transition"
+          >
+            Distribuição
+          </a>
+        </li>
+
+      </ul>
+    </div>
+
+    {/* CONTATO */}
+    <div>
+      <h4 className="text-white font-bold">Contato</h4>
+      <p className="mt-3 text-gray-400 text-sm">
+        (11) 3090-5544<br />
+        atendimento@bravacargo.com<br />
+        São Paulo – SP
+      </p>
+    </div>
+
+  </div>
+
+  {/* BARRA INFERIOR */}
+  <div className="border-t border-[#1E293B] py-3 text-center text-xs text-gray-500">
+    © 2008 Brava Cargo • Todos os direitos reservados
+  </div>
+
       </footer>
 
     </div>

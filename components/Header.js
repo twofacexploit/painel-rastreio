@@ -1,62 +1,102 @@
+import Image from "next/image";
 import { useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   return (
-    <header className="bg-white border-b shadow-sm sticky top-0 z-50 font-inter">
+    <header className="relative z-40 bg-[#0E1624]/90 backdrop-blur border-b border-[#1E293B]">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
 
-      <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+        {/* LOGO */}
+        <Image
+          src="/images/logo.png"
+          alt="Brava Cargo"
+          width={140}
+          height={44}
+          className="object-contain"
+          priority
+        />
 
-        {/* LOGO NOVO */}
-        <Link href="/" className="flex items-center gap-3 group">
-
-          {/* ÍCONE moderno */}
-          <div className="w-12 h-12 bg-gradient-to-br from-[#1E90FF] to-[#0A66C2] rounded-xl 
-                          flex items-center justify-center text-white font-extrabold text-xl shadow-md
-                          group-hover:scale-105 transition">
-            🚚
-          </div>
-
-          {/* TEXTO do LOGO moderno */}
-          <div className="flex flex-col leading-tight">
-            <span className="text-[22px] font-poppins font-bold text-[#0A3D62] tracking-wide group-hover:text-[#1E90FF] transition">
-              Brava Cargo
-            </span>
-            <span className="text-[11px] uppercase tracking-widest text-[#1E90FF] font-semibold">
-              logística & transporte
-            </span>
-          </div>
-        </Link>
-
-        {/* MENU DESKTOP */}
-        <nav className="hidden md:flex gap-10 font-poppins text-sm uppercase text-[#0A3D62]">
-          <Link href="/institucional" className="hover:text-[#1E90FF] transition">Institucional</Link>
-          <Link href="/servicos" className="hover:text-[#1E90FF] transition">Serviços</Link>
-          <Link href="/rastreamento" className="hover:text-[#1E90FF] transition">Rastreamento</Link>
-          <Link href="/contato" className="hover:text-[#1E90FF] transition">Contato</Link>
-        </nav>
-
-        {/* MENU MOBILE */}
+        {/* BOTÃO MOBILE */}
         <button
-          className="md:hidden text-3xl text-[#0A3D62]"
-          onClick={() => setOpen(!open)}
+          className="lg:hidden text-2xl text-white"
+          onClick={() => setMenuOpen(prev => !prev)}
+          aria-label="Menu"
         >
-          {open ? "✕" : "☰"}
+          {menuOpen ? "✕" : "☰"}
         </button>
+
+        {/* ================= MENU DESKTOP ================= */}
+        <nav className="hidden lg:flex gap-10 text-sm font-semibold text-gray-300">
+
+          {/* RASTREAR */}
+          <button
+            onClick={() => {
+              if (router.pathname === "/") {
+                document
+                  .getElementById("rastreamento")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              } else {
+                router.push("/#rastreamento");
+              }
+            }}
+            className="hover:text-[#1E90FF] transition"
+          >
+            Rastrear
+          </button>
+
+          {/* CONTATO */}
+          <button
+            onClick={() => router.push("/contato")}
+            className="hover:text-[#1E90FF] transition"
+          >
+            Contato
+          </button>
+
+        </nav>
       </div>
 
-      {/* MENU MOBILE DROPDOWN */}
-      {open && (
-        <div className="md:hidden absolute left-0 top-20 w-full bg-white border-t shadow-xl px-6 py-6 flex flex-col gap-6 font-poppins text-lg text-[#0A3D62]">
-          <Link href="/institucional" onClick={() => setOpen(false)}>Institucional</Link>
-          <Link href="/servicos" onClick={() => setOpen(false)}>Serviços</Link>
-          <Link href="/rastreamento" onClick={() => setOpen(false)}>Rastreamento</Link>
-          <Link href="/contato" onClick={() => setOpen(false)}>Contato</Link>
+      {/* ================= MENU MOBILE ================= */}
+      {menuOpen && (
+        <div className="lg:hidden bg-[#0A1220] border-b border-[#1E293B]">
+          <nav className="flex flex-col px-6 py-6 gap-6 text-base font-semibold text-gray-200">
+
+            {/* RASTREAR */}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                if (router.pathname === "/") {
+                  document
+                    .getElementById("rastreamento")
+                    ?.scrollIntoView({ behavior: "smooth" });
+                } else {
+                  router.push("/#rastreamento");
+                }
+              }}
+              className="flex items-center justify-between py-3 border-b border-[#1E293B]/60 hover:text-[#1E90FF]"
+            >
+              Rastrear
+              <span className="text-gray-500">›</span>
+            </button>
+
+            {/* CONTATO */}
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                router.push("/contato");
+              }}
+              className="flex items-center justify-between py-3 hover:text-[#1E90FF]"
+            >
+              Contato
+              <span className="text-gray-500">›</span>
+            </button>
+
+          </nav>
         </div>
       )}
-
     </header>
   );
 }
