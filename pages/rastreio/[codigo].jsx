@@ -225,19 +225,27 @@ export default function Rastreio() {
 
   const currentStep = progressIndex(lastEvent.title)
 
-  /* ================= RENDER ================= */
-  return (
-    <div className="<footer className="bg-[#020617] relative z-50">
+/* ================= RENDER ================= */
+return (
+  <div className="bg-[#0E1624] text-gray-200 min-h-screen">
 
-      {/* HEADER */}
-      <header className="bg-[#0E1624] border-b border-[#1E293B]">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <Image src="/images/logo.png" alt="Brava Cargo" width={180} height={60} />
-          <button onClick={() => router.push("/")} className="text-sm text-gray-400 hover:text-[#1E90FF]">
-            ← Voltar
-          </button>
-        </div>
-      </header>
+    {/* HEADER */}
+    <header className="bg-[#0E1624] border-b border-[#1E293B]">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <Image
+          src="/images/logo.png"
+          alt="Brava Cargo"
+          width={180}
+          height={60}
+        />
+        <button
+          onClick={() => router.push("/")}
+          className="text-sm text-gray-400 hover:text-[#1E90FF]"
+        >
+          ← Voltar
+        </button>
+      </div>
+    </header>
       {/* ================= PROGRESSO ================= */}
       <section className="max-w-5xl mx-auto px-6 mt-10">
         <div className="bg-[#0A1220] border border-[#1E293B] rounded-xl p-6 md:p-8 overflow-x-auto">
