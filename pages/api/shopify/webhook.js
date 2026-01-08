@@ -2,7 +2,6 @@ import crypto from "crypto";
 import getRawBody from "raw-body";
 import clientPromise from "@/lib/mongodb";
 import { createOrGetTrackingForOrder } from "@/lib/trackings";
-import { sendTrackingEmail } from "@/lib/email";
 
 export const config = {
   api: {
@@ -74,13 +73,6 @@ export default async function handler(req, res) {
     if (tracking.emailSent === true) {
       return res.status(200).send("Email já enviado");
     }
-
-    // 3️⃣ ENVIA EMAIL (PRIMEIRO)
-    await sendTrackingEmail({
-      to: email,
-      name,
-      code: tracking.trackingCode,
-    });
 
     // 4️⃣ MARCA COMO ENVIADO (SÓ APÓS SUCESSO)
     await db.collection("trackings").updateOne(
