@@ -1,9 +1,8 @@
-// pages/api/shopify/webhook.js
 import crypto from "crypto";
 import getRawBody from "raw-body";
-import { createOrGetTrackingForOrder } from "../../../lib/trackings";
-import { sendTrackingEmail } from "../../../lib/email";
-import clientPromise from "../../../lib/mongodb";
+import clientPromise from "@/lib/mongodb";
+import { createOrGetTrackingForOrder } from "@/lib/trackings";
+import { sendTrackingEmail } from "@/lib/email";
 
 export const config = {
   api: {
@@ -29,9 +28,9 @@ export default async function handler(req, res) {
     return res.status(400).send("Erro lendo body");
   }
 
+  // 🔐 HEADERS SHOPIFY
   const hmacHeader = req.headers["x-shopify-hmac-sha256"];
   const topic = req.headers["x-shopify-topic"];
-  const shopDomain = req.headers["x-shopify-shop-domain"];
 
   const generatedHmac = crypto
     .createHmac("sha256", secret)
@@ -39,7 +38,7 @@ export default async function handler(req, res) {
     .digest("base64");
 
   if (generatedHmac !== hmacHeader) {
-    console.log("❌ HMAC inválido");
+    console.error("❌ HMAC inválido");
     return res.status(401).send("HMAC inválido");
   }
 
@@ -50,62 +49,63 @@ export default async function handler(req, res) {
     return res.status(400).send("JSON inválido");
   }
 
-  console.log("✅ Webhook verificado:", topic, "loja:", shopDomain);
-
-  // 🔒 SÓ PROCESSA PEDIDO PAGO
-  const isPaid =
-    payload.financial_status === "paid" ||
-    payload.financial_status === "partially_paid";
-
-  if (!isPaid) {
-    return res.status(200).send("Pedido ainda não pago");
+  // 🔒 PROCESSA SOMENTE PEDIDOS
+  if (topic !== "orders/create" && topic !== "orders/updated") {
+    return res.status(200).send("Evento ignorado");
   }
 
-  if (topic === "orders/create" || topic === "orders/updated") {
-    try {
-      const tracking = await createOrGetTrackingForOrder(payload);
+  try {
+    const client = await clientPromise;
+    const db = client.db(process.env.MONGODB_DB || "rastreio_db");
 
-      if (!tracking?.customer?.email) {
-        return res.status(200).send("Pedido sem email do cliente");
-      }
+    // 1️⃣ CRIA OU BUSCA O TRACKING
+    const tracking = await createOrGetTrackingForOrder(payload);
 
-      const client = await clientPromise;
-      const db = client.db();
+    // 🔎 VALIDA EMAIL
+    const email = tracking.customer?.email;
+    const name = tracking.customer?.first_name || "Cliente";
 
-      // 🔒 IDPOTÊNCIA REAL (ANTI DUPLICAÇÃO)
-      const result = await db.collection("trackings").findOneAndUpdate(
-        {
-          trackingCode: tracking.trackingCode,
-          emailSent: false,
-        },
-        {
-          $set: { emailSent: true },
-        }
-      );
-
-      // Se não encontrou para atualizar, email já foi enviado
-      if (!result.value) {
-        return res.status(200).send("Email já enviado");
-      }
-
-      await sendTrackingEmail({
-        to: tracking.customer.email,
-        name: tracking.customer.first_name,
-        code: tracking.trackingCode,
-      });
-
-      console.log("📧 Email de rastreio enviado com sucesso");
-
-      return res.status(200).json({
-        ok: true,
-        trackingCode: tracking.trackingCode,
-      });
-
-    } catch (err) {
-      console.error("Erro criando tracking:", err);
-      return res.status(500).send("Erro ao criar tracking");
+    if (!email) {
+      console.warn("Pedido sem email, ignorado");
+      return res.status(200).send("Pedido sem email");
     }
-  }
 
-  return res.status(200).send("OK");
+    // 2️⃣ VERIFICA SE JÁ FOI ENVIADO
+    if (tracking.emailSent === true) {
+      return res.status(200).send("Email já enviado");
+    }
+
+    // 3️⃣ ENVIA EMAIL (PRIMEIRO)
+    await sendTrackingEmail({
+      to: email,
+      name,
+      code: tracking.trackingCode,
+    });
+
+    // 4️⃣ MARCA COMO ENVIADO (SÓ APÓS SUCESSO)
+    await db.collection("trackings").updateOne(
+      { _id: tracking._id },
+      {
+        $set: {
+          emailSent: true,
+          emailSentAt: new Date(),
+        },
+      }
+    );
+
+    console.log(
+      "📧 Email enviado via webhook:",
+      email,
+      tracking.trackingCode
+    );
+
+    return res.status(200).json({
+      ok: true,
+      trackingCode: tracking.trackingCode,
+    });
+
+  } catch (error) {
+    console.error("Erro no webhook:", error);
+    return res.status(500).send("Erro interno");
+  }
 }
