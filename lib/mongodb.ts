@@ -18,10 +18,18 @@ declare global {
 
 if (!global._mongoClientPromise) {
   client = new MongoClient(uri);
-  clientPromise = client.connect();
-  global._mongoClientPromise = clientPromise;
-} else {
-  clientPromise = global._mongoClientPromise;
+  global._mongoClientPromise = client.connect();
+}
+
+clientPromise = global._mongoClientPromise;
+
+/**
+ * Retorna a instância do banco de dados
+ * Uso recomendado para APIs e webhooks
+ */
+export async function connectDB() {
+  const client = await clientPromise;
+  return client.db();
 }
 
 export default clientPromise;

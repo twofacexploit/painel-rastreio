@@ -227,7 +227,7 @@ export default function Rastreio() {
 
   /* ================= RENDER ================= */
   return (
-    <div className="bg-[#0E1624] text-gray-200 min-h-screen">
+    <div className="<footer className="bg-[#020617] relative z-50">
 
       {/* HEADER */}
       <header className="bg-[#0E1624] border-b border-[#1E293B]">

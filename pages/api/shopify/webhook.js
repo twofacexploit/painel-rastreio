@@ -2,10 +2,12 @@
 import crypto from "crypto";
 import getRawBody from "raw-body";
 import { createOrGetTrackingForOrder } from "../../../lib/trackings";
+import { sendTrackingEmail } from "../../../lib/email";
+import clientPromise from "../../../lib/mongodb";
 
 export const config = {
   api: {
-    bodyParser: false, // importante: vamos ler o raw body
+    bodyParser: false,
   },
 };
 
@@ -38,39 +40,54 @@ export default async function handler(req, res) {
 
   if (generatedHmac !== hmacHeader) {
     console.log("❌ HMAC inválido");
-    console.log("Recebido: ", hmacHeader);
-    console.log("Gerado:   ", generatedHmac);
     return res.status(401).send("HMAC inválido");
   }
 
-  // Agora sim, o body é confiável
   let payload;
   try {
     payload = JSON.parse(rawBody.toString("utf8"));
   } catch (err) {
-    console.error("Erro parse JSON", err);
     return res.status(400).send("JSON inválido");
   }
 
   console.log("✅ Webhook verificado:", topic, "loja:", shopDomain);
 
-  // Vamos lidar só com orders/create e orders/updated por enquanto
   if (topic === "orders/create" || topic === "orders/updated") {
     try {
       const tracking = await createOrGetTrackingForOrder(payload);
 
       console.log("Tracking gerado/encontrado:", tracking.trackingCode);
 
-      // Aqui é onde, futuramente, você envia email ou WhatsApp
-      // Por enquanto, só retorna OK
+      // 📧 ENVIO DE EMAIL (NO LUGAR CERTO)
+      if (!tracking.emailSent && tracking.customer?.email) {
+        await sendTrackingEmail({
+          to: tracking.customer.email,
+          name: tracking.customer.first_name,
+          code: tracking.trackingCode,
+        });
 
-      return res.status(200).json({ ok: true, trackingCode: tracking.trackingCode });
+        // marca como enviado
+        const client = await clientPromise;
+        const db = client.db();
+
+        await db.collection("rastreios").updateOne(
+          { trackingCode: tracking.trackingCode },
+          { $set: { emailSent: true } }
+        );
+
+        console.log("📧 Email de rastreio enviado");
+      }
+
+      return res.status(200).json({
+        ok: true,
+        trackingCode: tracking.trackingCode,
+      });
+
     } catch (err) {
       console.error("Erro criando tracking:", err);
       return res.status(500).send("Erro ao criar tracking");
     }
   }
 
-  // Outros tópicos: só confirma
   return res.status(200).send("OK");
 }
