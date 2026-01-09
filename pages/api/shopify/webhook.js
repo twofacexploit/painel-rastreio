@@ -60,34 +60,20 @@ export default async function handler(req, res) {
     // 1️⃣ CRIA OU BUSCA O TRACKING
     const tracking = await createOrGetTrackingForOrder(payload);
 
-    // 🔎 VALIDA EMAIL
+    // 🔎 SE NÃO TEM EMAIL, NÃO FAZ NADA
     const email = tracking.customer?.email;
-    const name = tracking.customer?.first_name || "Cliente";
-
     if (!email) {
       console.warn("Pedido sem email, ignorado");
       return res.status(200).send("Pedido sem email");
     }
 
-    // 2️⃣ VERIFICA SE JÁ FOI ENVIADO
-    if (tracking.emailSent === true) {
-      return res.status(200).send("Email já enviado");
-    }
-
-    // 4️⃣ MARCA COMO ENVIADO (SÓ APÓS SUCESSO)
-    await db.collection("trackings").updateOne(
-      { _id: tracking._id },
-      {
-        $set: {
-          emailSent: true,
-          emailSentAt: new Date(),
-        },
-      }
-    );
+    // ⚠️ IMPORTANTE:
+    // ❌ NÃO ENVIA EMAIL AQUI
+    // ❌ NÃO MARCA emailSent
+    // ✅ O CRON VAI CUIDAR DISSO
 
     console.log(
-      "📧 Email enviado via webhook:",
-      email,
+      "📦 Tracking criado/atualizado:",
       tracking.trackingCode
     );
 
