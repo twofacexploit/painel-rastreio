@@ -7,11 +7,11 @@ console.log("⏱️ Cron de rastreamento iniciado (a cada 10s)");
 
 cron.schedule("*/10 * * * * *", async () => {
   try {
-    const enviados = await sendPendingTrackingEmails();
-    if (enviados > 0) {
-      console.log(`✅ ${enviados} emails enviados`);
+    const sent = await sendPendingTrackingEmails();
+    if (sent) {
+      console.log("📨 Email processado");
     }
   } catch (err) {
-    console.error("Erro no cron:", err.message);
+    console.error("❌ Erro no cron:", err.message);
   }
 });
