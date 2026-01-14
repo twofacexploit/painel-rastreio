@@ -142,7 +142,7 @@ export default function Contato() {
 
       {/* ================= FOOTER ================= */}
       <footer className="border-t border-[#1E293B] bg-[#020617] py-6 text-center text-xs text-gray-500">
-        © {new Date().getFullYear()} Brava Cargo • Todos os direitos reservados
+        © 2008 Brava Cargo • Todos os direitos reservados
       </footer>
 
     </div>
