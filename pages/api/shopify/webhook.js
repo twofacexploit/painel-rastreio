@@ -53,11 +53,25 @@ export default async function handler(req, res) {
     return res.status(200).send("Evento ignorado");
   }
 
+  // ✅ AQUI ESTÁ A CORREÇÃO PRINCIPAL
+  // 🔒 ACEITA SOMENTE PEDIDOS COM PAGAMENTO CONFIRMADO
+  const financialStatus = payload?.financial_status;
+
+  if (financialStatus !== "paid") {
+    console.log(
+      "⏭ Pedido ignorado — pagamento não confirmado:",
+      financialStatus,
+      "Pedido:",
+      payload?.order_number
+    );
+    return res.status(200).send("Pedido não pago — ignorado");
+  }
+
   try {
     const client = await clientPromise;
     const db = client.db(process.env.MONGODB_DB || "rastreio_db");
 
-    // 1️⃣ CRIA OU BUSCA O TRACKING
+    // 1️⃣ CRIA OU BUSCA O TRACKING (APENAS PARA PEDIDOS PAGOS)
     const tracking = await createOrGetTrackingForOrder(payload);
 
     // 🔎 SE NÃO TEM EMAIL, NÃO FAZ NADA
@@ -73,7 +87,7 @@ export default async function handler(req, res) {
     // ✅ O CRON VAI CUIDAR DISSO
 
     console.log(
-      "📦 Tracking criado/atualizado:",
+      "📦 Tracking criado para pedido pago:",
       tracking.trackingCode
     );
 
